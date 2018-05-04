@@ -1,0 +1,187 @@
+how to set cron job usnig putty
+sudo crontab -e
+
+* * * * * wget -q http://sangeet4all.com/test-mail2.php
+press ctrl+x
+press y  then enter
+
+/*********************   cron restart *************************/
+sudo service cron restart
+/***********************  how to print date + days *************/
+
+date +%d -d tomorrow
+
+/************************ run a cron at last day of months ****************************************/
+
+59 23 28-32 * * [‘$(date +%d -d tomorrow)’ == ’01’ ] && wget -q http://sangeet4all.com/test-mail3.php
+
+Tue Mar  7 13:25:35 UTC 2017
+18:54  sudo date --set "31 Mar 2013 13:29:00"
+
+* * 30-31 * * wget -q http://sangeet4all.com/cron_quaterly_reportcard.php
+
+****************  how to restart apache ***************************************
+sudo service apache2 reload
+
+***** link for the install serverces *******************
+https://trinitytuts.com/install-apache-php-mysql-and-phpmyadmin-on-ubuntu/
+
+
+*** Login into your putty account
+*** for go to root ****
+   sudo su -
+*** for update all settings ****
+   sudo apt-get update
+**** install apache2 ****
+  sudo apt-get install apache2
+*** edit the apache server configuration file  *****
+  sudo nano /etc/apache2/mods-enabled/dir.conf
+  DirectoryIndex index.php index.html index.cgi index.pl index.xhtml index.htm
+  then  Restart the server
+  sudo systemctl restart apache2
+
+*** adjust the firewall to allow web traffic ** allow to http and https ***
+   sudo ufw app list   
+   sudo ufw app info "Apache Full"
+   then  Restart the server
+   sudo systemctl restart apache2
+
+*** install mysql ***
+    sudo apt-get install mysql-server
+    enter root user password
+    then  Restart the server
+    sudo systemctl restart apache2
+
+*** for sucure mysql connetion run this commands *****
+   sudo mysql_secure_installation
+   enter current password for root
+    ** first step no for change the root password   **no
+    ** then always Yes 
+   enter new password
+   enter confirm password
+   then  Restart the server
+   sudo systemctl restart apache2
+  
+*** install php ****
+   sudo apt-get install php libapache2-mod-php php mcrypt php-mysql
+   then  Restart the server
+   sudo systemctl restart apache2
+
+
+
+*** goto test php info file **** got to root directory of server
+   sudo nano /var/www/html/info.php
+   <?php phpinfo(); ?>
+   ctrl+x then y press enter
+
+*** install phpmyadmin ****
+   apt-get install phpmyadmin php-mbstring php-gettext
+   or ** sudo apt-get install phpmyadmin
+   choose apache2 default
+   then yes
+   then enter phpmyadmin password
+   then enter confirm password
+   then 
+   sudo systemctl restart apache2
+
+*** for enable the php mcrypt and mbstring extensions ****
+  sudo phpenmod mcrypt
+  sudo phpenmod mbstring
+  then 
+  sudo systemctl restart apache2
+
+***  If you get 404 not found error then run below command in terminal to create sortlink **
+  sudo ln -s /usr/share/phpmyadmin /var/www/html
+
+*** working with mysql in ubuntu sever
+   mysql -u root -p ( for login into mysql from root user )
+   enter the root password
+
+**** Stop mysql: *************
+   sudo service mysql stop
+
+**** Start mysql (normal): ****
+  sudo service mysql start
+
+*****  Kill the temporary mysql safe mode session: ****
+   sudo mysqladmin shutdown
+
+************* if group by command is not working  **********
+   goto to root
+   sudo vim /etc/mysql/my.cnf
+   scroll bottom page
+   paste:
+   [mysqld]
+sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+
+***** install cakephp in ubuntu server  ******
+   cd----- goto your project folder--
+    copy below line one by and paste press enter
+   HTTPDUSER=`ps aux | grep -E '[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx' | grep -v root | head -1 | cut -d\  -f1`
+   setfacl -R -m u:${HTTPDUSER}:rwx tmp
+   setfacl -R -d -m u:${HTTPDUSER}:rwx tmp
+   setfacl -R -m u:${HTTPDUSER}:rwx logs
+   setfacl -R -d -m u:${HTTPDUSER}:rwx logs
+
+****** config file for phpmyadmin  ******
+Creating config file /etc/dbconfig-common/phpmyadmin.conf with new version
+Creating config file /etc/phpmyadmin/config-db.php with new version
+
+******  if htacess file is not working on ubunty server  *****
+1) sudo nano /etc/apache2/apache2.conf
+2) remove comment sign (#) if you find it before this lin
+   AccessFileName .htaccess
+3)
+<Directory /var/www/>
+     Options Indexes FollowSymLinks
+     AllowOverride None
+     Require all granted
+</Directory>
+4) replace "None" with "All"
+5) sudo a2enmod rewrite
+6) sudo /etc/init.d/apache2 restart
+
+*****  if you headers is not working for cache for seo  *****
+ 1) sudo a2enmod headers
+ 2) then restart server
+************  if phpmyadmin not open in cakephp ********
+1) in root htaccess file
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+    Rewriterule ^phpmyadmin/.*$ - [PT]
+    RewriteRule  ^$ app/webroot/    [L]
+    RewriteRule  (.*) app/webroot/$1 [L]
+</IfModule> 
+
+************* give permession of all subfolder
+sudo chmod -R 777 /var/www/html/blog/wp-content/uploads
+
+****** if wordpress ask for give the information to ftp details
+sudo chown username:www-data /var/www -R 
+
+******* delete a folder from server****
+sudo rm -r /var/www/html/demo/node
+
+*** show directory ****
+ls ~ /usr
+
+*** unzip the zip folder extract***
+sudo apt-get install unzip
+unzip /var/www/html/file.zip -d somedir
+
+***** move folder ****
+sudo mv /home/ubuntu/nodew /var/www/html/demo
+
+unzip /var/www/html/demo/node2/node-js-getting-started/nodew.zip -d /var/www/html/demo/node2/node-js-getting-started/
+
+chown -R www-data /var/www/html/demo/node2/node-js-getting-started/nodew
+
+if forever is not workig
+forever start -c "npm start" /var/www/html/demo/node/app.js
+
+/**** set up mail on ubuntu server ****/
+sudo apt-get update
+sudo apt-get install postfix    // everything  settings should be default
+sudo systemctl restart apache2
+Note : now your mail function is working
+
